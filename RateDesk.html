@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RateDesk — Internal Pricing Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --app-bg:#f4f6f9;--surface:#ffffff;--surface2:#f0f2f6;--surface3:#e8ecf2;
+  --border:#dde2ea;--border2:#c8d0dc;
+  --accent:#e8431c;--accent2:#c73516;
+  --navy:#1b2a4a;--navy2:#243560;
+  --text:#1b2a4a;--text2:#4a5578;--text3:#8b96b0;
+  --success:#16a34a;--warn:#d97706;--danger:#dc2626;
+  --green-bg:#f0fdf4;--red-bg:#fef2f2;
+  --font:'DM Sans',system-ui,sans-serif
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:var(--font);background:var(--app-bg);color:var(--text);font-size:14px}
+/* LOGIN */
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:var(--navy)}
+.login-box{background:#fff;border-radius:16px;padding:40px 44px;width:400px;box-shadow:0 20px 60px rgba(0,0,0,.25)}
+.login-logo{font-size:22px;font-weight:700;color:var(--navy);margin-bottom:4px}
+.login-logo span{color:var(--accent)}
+.login-sub{font-size:13px;color:var(--text3);margin-bottom:28px}
+.login-label{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;display:block}
+.login-input{width:100%;padding:10px 14px;border:1.5px solid var(--border);border-radius:9px;font-family:var(--font);font-size:14px;color:var(--text);transition:border-color .15s;margin-bottom:14px}
+.login-input:focus{outline:none;border-color:var(--accent)}
+.login-btn{width:100%;padding:11px;background:var(--accent);color:#fff;border:none;border-radius:9px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;transition:background .15s;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
+.login-btn:hover{background:var(--accent2)}
+.login-btn:disabled{opacity:.6;cursor:not-allowed}
+.login-err{background:#fef2f2;border:1px solid #fecaca;color:#991b1b;border-radius:8px;padding:9px 13px;font-size:12px;margin-bottom:14px;display:none}
+.login-err.show{display:block}
+/* APP */
+.app{display:flex;height:100vh;overflow:hidden}
+.sidebar{width:235px;min-width:235px;background:var(--navy);display:flex;flex-direction:column}
+.logo{padding:22px 20px 18px;border-bottom:1px solid rgba(255,255,255,.1)}
+.logo-title{font-size:18px;font-weight:700;color:#fff}
+.logo-title span{color:var(--accent)}
+.logo-sub{font-size:11px;color:rgba(255,255,255,.4);margin-top:3px}
+.nav-section{padding:18px 12px 6px;font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.12em;font-weight:600}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 16px;margin:1px 8px;border-radius:8px;cursor:pointer;color:rgba(255,255,255,.6);font-size:13px;transition:all .15s;user-select:none}
+.nav-item:hover{background:rgba(255,255,255,.08);color:#fff}
+.nav-item.active{background:var(--accent);color:#fff;font-weight:600}
+.nav-item.disabled{opacity:.3;pointer-events:none}
+.nav-item .ti{font-size:16px;flex-shrink:0}
+.sidebar-footer{margin-top:auto;padding:14px;border-top:1px solid rgba(255,255,255,.1)}
+.user-badge{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;background:rgba(255,255,255,.07)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#fff;flex-shrink:0}
+.user-info{flex:1;min-width:0}
+.user-name{font-size:12px;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.user-role-lbl{font-size:10px;color:rgba(255,255,255,.45)}
+.logout-btn{background:none;border:none;cursor:pointer;color:rgba(255,255,255,.4);font-size:16px;padding:2px;transition:color .15s}
+.logout-btn:hover{color:#fff}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{padding:14px 26px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;background:var(--surface);flex-shrink:0}
+.topbar-title{font-size:17px;font-weight:700;color:var(--navy)}
+.topbar-sub{font-size:12px;color:var(--text3);margin-top:2px}
+.content{flex:1;overflow-y:auto;padding:24px 26px;background:var(--app-bg)}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px}
+.card-title{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:14px;display:flex;align-items:center;gap:7px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+.metric-label{font-size:10px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.metric-val{font-size:22px;font-weight:700;color:var(--navy)}
+.metric-val.accent{color:var(--accent)}
+.metric-sub{font-size:11px;color:var(--text3);margin-top:3px}
+input,select,textarea{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:8px 12px;color:var(--text);font-family:var(--font);font-size:13px;width:100%;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent)}
+input::placeholder,textarea::placeholder{color:var(--text3)}
+label{font-size:12px;color:var(--text2);display:block;margin-bottom:5px;font-weight:500}
+.btn{display:inline-flex;align-items:center;gap:7px;padding:8px 16px;border-radius:8px;border:none;cursor:pointer;font-family:var(--font);font-size:13px;font-weight:500;transition:all .15s}
+.btn-primary{background:var(--accent);color:#fff}
+.btn-primary:hover{background:var(--accent2)}
+.btn-ghost{background:transparent;border:1px solid var(--border);color:var(--text2)}
+.btn-ghost:hover{border-color:var(--border2);color:var(--navy);background:var(--surface2)}
+.btn-success{background:#dcfce7;border:1px solid #bbf7d0;color:#166534}
+.btn-success:hover{background:#bbf7d0}
+.btn-sm{padding:5px 11px;font-size:12px}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;color:var(--text3);text-align:left;padding:9px 12px;border-bottom:1px solid var(--border);font-weight:600;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap;background:var(--surface2)}
+td{padding:10px 12px;border-bottom:1px solid var(--border);color:var(--text2);font-size:13px;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--surface2)}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:500}
+.badge-exp{background:var(--surface2);color:var(--text2);border:1px solid var(--border)}
+.badge-admin{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+.badge-sales{background:#f0fdf4;color:#166534;border:1px solid #bbf7d0}
+.badge-inactive{background:#f9fafb;color:#9ca3af;border:1px solid #e5e7eb}
+.filters{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-bottom:16px}
+.filters .fg{flex:1;min-width:140px}
+.search-wrap{position:relative}
+.search-wrap input{padding-left:34px}
+.search-icon{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:15px;pointer-events:none}
+.quote-line{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px}
+.ql-grid{display:grid;grid-template-columns:1.8fr 1fr 1.3fr 90px 60px 110px 110px 36px;gap:8px;align-items:end}
+.ql-label{font-size:11px;color:var(--text3);margin-bottom:4px;font-weight:500}
+.del-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;background:var(--red-bg);border:1px solid #fecaca;border-radius:8px;cursor:pointer;color:var(--danger);font-size:14px;flex-shrink:0;transition:background .15s}
+.del-btn:hover{background:#fee2e2}
+.add-line-area{border:2px dashed var(--border2);border-radius:10px;padding:16px;text-align:center;cursor:pointer;color:var(--text3);transition:all .15s;margin-bottom:14px}
+.add-line-area:hover{border-color:var(--accent);color:var(--accent)}
+.quote-total-bar{background:var(--navy);border-radius:12px;padding:18px 22px;margin-top:16px}
+.qtb-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.1)}
+.qtb-row:last-child{border-bottom:none;padding-top:12px}
+.qtb-label{font-size:13px;color:rgba(255,255,255,.65)}
+.qtb-val{font-size:14px;font-weight:600;color:#fff}
+.qtb-val.big{font-size:24px;color:var(--accent);font-weight:700}
+.chart-bar-wrap{margin-top:4px}
+.bar-item{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+.bar-label{width:210px;font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;flex-shrink:0}
+.bar-track{flex:1;height:7px;background:var(--surface2);border-radius:4px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;background:var(--accent);transition:width .4s}
+.bar-val{width:90px;font-size:12px;color:var(--text2);text-align:right;flex-shrink:0}
+.flag{display:flex;align-items:flex-start;gap:10px;padding:10px 14px;border-radius:8px;margin-bottom:8px;font-size:12px;line-height:1.5}
+.flag-warn{background:#fffbeb;border:1px solid #fde68a;color:#92400e}
+.flag-danger{background:var(--red-bg);border:1px solid #fecaca;color:#991b1b}
+.flag-ok{background:var(--green-bg);border:1px solid #bbf7d0;color:#166534}
+.admin-row{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1fr 1.1fr;gap:8px;align-items:center;padding:9px 14px;border-bottom:1px solid var(--border);font-size:12px;transition:background .15s}
+.admin-row:hover{background:var(--surface2)}
+.admin-header{font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.07em;padding:9px 14px;background:var(--surface2);border-bottom:1px solid var(--border)}
+.margin-pill{padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.margin-good{background:#dcfce7;color:#166534}
+.margin-warn{background:#fef9c3;color:#854d0e}
+.margin-bad{background:#fee2e2;color:#991b1b}
+.margin-na{background:var(--surface2);color:var(--text3)}
+.section-hd{font-size:20px;font-weight:700;margin-bottom:4px;color:var(--navy)}
+.section-sd{font-size:13px;color:var(--text3);margin-bottom:20px}
+.toast{position:fixed;bottom:24px;right:24px;padding:10px 18px;border-radius:10px;font-size:13px;font-weight:500;z-index:9999;opacity:0;transition:opacity .3s;pointer-events:none;color:#fff}
+.toast.show{opacity:1}
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--border)}
+.note-bar{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:12px;color:var(--text3);margin-top:10px}
+.saving-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;display:inline-block;margin-left:6px;opacity:0;transition:opacity .3s}
+.saving-dot.show{opacity:1}
+.ar-inp{width:100%;padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);color:var(--text);font-family:var(--font);transition:border-color .2s}
+.ar-inp:focus{outline:none;border-color:var(--accent);background:#fff}
+.ar-inp.saving{border-color:#f59e0b}
+.ar-inp.saved{border-color:#16a34a}
+.loading-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:12px;color:var(--text3)}
+.spinner{width:28px;height:28px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.file-upload-zone{border:2px dashed var(--border2);border-radius:8px;padding:12px 14px;text-align:center;cursor:pointer;transition:all .15s;background:var(--surface2)}
+.file-upload-zone:hover{border-color:var(--accent);background:#fff5f3}
+.file-upload-zone.has-file{border-color:#16a34a;background:#f0fdf4}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:1000}
+.modal{background:#fff;border-radius:14px;padding:28px 32px;width:460px;box-shadow:0 20px 60px rgba(0,0,0,.2)}
+.modal-title{font-size:17px;font-weight:700;color:var(--navy);margin-bottom:20px}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Rate<span>Desk</span></div>
+    <div class="login-sub">Internal Pricing Platform — Clarion Technologies</div>
+    <div class="login-err" id="login-err"></div>
+    <label class="login-label">Email Address</label>
+    <input class="login-input" type="email" id="login-email" placeholder="you@clariontech.com"
+      onkeydown="if(event.key==='Enter')document.getElementById('login-pw').focus()">
+    <label class="login-label">Password</label>
+    <input class="login-input" type="password" id="login-pw" placeholder="Enter your password"
+      onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" id="login-btn" onclick="doLogin()">
+      Sign In <i class="ti ti-arrow-right"></i>
+    </button>
+    <div style="margin-top:18px;font-size:11px;color:var(--text3);text-align:center">
+      Contact your Pricing Admin for access
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div class="app" id="main-app" style="display:none">
+  <div class="sidebar">
+    <div class="logo">
+      <div class="logo-title">Rate<span>Desk</span></div>
+      <div class="logo-sub">Internal Pricing Platform</div>
+    </div>
+    <div class="nav-section">Sales</div>
+    <div class="nav-item active" onclick="showPage('explorer')" id="nav-explorer">
+      <i class="ti ti-layout-grid"></i> Rate Explorer
+    </div>
+    <div class="nav-item" onclick="showPage('quote')" id="nav-quote">
+      <i class="ti ti-file-invoice"></i> Quote Builder
+    </div>
+    <div class="nav-item" onclick="showPage('request')" id="nav-request">
+      <i class="ti ti-send"></i> Rate Request
+    </div>
+    <div class="nav-section">Admin</div>
+    <div class="nav-item disabled" onclick="showPage('admin')" id="nav-admin">
+      <i class="ti ti-shield"></i> Rate Management
+    </div>
+    <div class="nav-item disabled" onclick="showPage('analytics')" id="nav-analytics">
+      <i class="ti ti-chart-bar"></i> Analytics
+    </div>
+    <div class="nav-item disabled" onclick="showPage('requests_admin')" id="nav-requests_admin">
+      <i class="ti ti-clipboard-list"></i> Rate Requests
+      <span id="open-badge" style="display:none;background:#e8431c;color:#fff;border-radius:10px;padding:1px 7px;font-size:10px;font-weight:700;margin-left:auto">0</span>
+    </div>
+    <div class="nav-item disabled" onclick="showPage('users')" id="nav-users">
+      <i class="ti ti-users"></i> User Management
+    </div>
+    <div class="nav-item disabled" onclick="showPage('auditlog')" id="nav-auditlog">
+      <i class="ti ti-history"></i> Change Log
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-badge">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <div class="user-info">
+          <div class="user-name" id="user-name-display">Loading...</div>
+          <div class="user-role-lbl" id="user-role-display">—</div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()" title="Sign out"><i class="ti ti-logout"></i></button>
+      </div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="topbar">
+      <div>
+        <div class="topbar-title" id="page-title">Rate Explorer</div>
+        <div class="topbar-sub" id="page-sub">Browse and filter all available rates</div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center" id="topbar-actions">
+        <span class="saving-dot" id="saving-dot"></span>
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+  </div>
+</div>
+<div id="modal-container"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────
+const SB_URL = 'https://qkynbizkphsfhzuezccg.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFreW5iaXprcGhzZmh6dWV6Y2NnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgwNTI3NTQsImV4cCI6MjA5MzYyODc1NH0.wJ__g5A9iW6m77GYgfDvUf3hvfSXZeefHRoQYodhtmU';
+const HEADERS = {'Content-Type':'application/json','apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY};
+const USD_INR=75, WEEKS_YEAR=52;
+
+// ── SIMPLE HASH (not bcrypt — browser compatible) ─────────────
+// Uses SHA-256 via Web Crypto API
+async function hashPassword(pw){
+  const enc = new TextEncoder().encode(pw + 'ratedesk_salt_2025');
+  const buf = await crypto.subtle.digest('SHA-256', enc);
+  return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+// ── SUPABASE HELPERS ──────────────────────────────────────────
+async function sbGet(table,params=''){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}?${params}`,{headers:HEADERS});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbPost(table,data,prefer='return=representation'){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:{...HEADERS,'Prefer':prefer},body:JSON.stringify(data)});
+  if(!r.ok) throw new Error(await r.text());
+  return prefer.includes('return=representation')?r.json():null;
+}
+async function sbPatch(table,filter,data){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}?${filter}`,{method:'PATCH',headers:{...HEADERS,'Prefer':'return=representation'},body:JSON.stringify(data)});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function sbDelete(table,filter){
+  const r=await fetch(`${SB_URL}/rest/v1/${table}?${filter}`,{method:'DELETE',headers:HEADERS});
+  if(!r.ok) throw new Error(await r.text());
+}
+async function uploadFile(path,file){
+  const r=await fetch(`${SB_URL}/storage/v1/object/jd-documents/${path}`,{
+    method:'POST',headers:{'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':file.type,'x-upsert':'true'},body:file});
+  if(!r.ok) throw new Error(await r.text());
+  return r.json();
+}
+async function getFileUrl(path){
+  const r=await fetch(`${SB_URL}/storage/v1/object/sign/jd-documents/${path}`,{
+    method:'POST',headers:{...HEADERS},body:JSON.stringify({expiresIn:300})});
+  if(!r.ok) throw new Error(await r.text());
+  const d=await r.json();
+  return SB_URL+'/storage/v1'+d.signedURL;
+}
+async function logAudit(action,tableName,recordId,fieldName,oldVal,newVal){
+  if(!currentUser) return;
+  try{
+    await sbPost('rd_audit_log',{user_id:currentUser.id,user_name:currentUser.name,user_email:currentUser.email,action,table_name:tableName,record_id:recordId,field_name:fieldName,old_value:String(oldVal??''),new_value:String(newVal??'')},'');
+  }catch(e){}
+}
+
+// ── STATE ─────────────────────────────────────────────────────
+let currentUser=null, rateData=[], quoteLines=[], currentPage='explorer';
+let filterState={search:'',cat:'',exp:'',eng:''};
+let nextLineId=1, saveTimers={}, activeReqFilter='Open';
+let reqSkillRows=[{id:1,skill:'',exp:'',engagement:'ft',roleType:'Developer',jd:'',file:null,fileName:''}];
+let reqSkillId=2;
+
+// ── HELPERS ───────────────────────────────────────────────────
+function fmt(n){return n!=null?'$'+Math.round(n).toLocaleString('en-US'):'—';}
+function fmtINR(n){return n?'₹'+Math.round(n/1000)+'K':'—';}
+function calcMargin(r){
+  if(!r.ctc) return null;
+  return ((r.ft-(r.ctc/WEEKS_YEAR/USD_INR))/r.ft)*100;
+}
+function showToast(msg,color='#16a34a'){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.style.background=color;t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+function showSavingDot(on){document.getElementById('saving-dot').classList.toggle('show',on);}
+function genRef(){
+  const n=new Date();
+  return 'RR-'+n.getFullYear().toString().slice(2)+String(n.getMonth()+1).padStart(2,'0')+String(n.getDate()).padStart(2,'0')+'-'+Math.floor(Math.random()*9000+1000);
+}
+
+// ── LOGIN ─────────────────────────────────────────────────────
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim().toLowerCase();
+  const pw=document.getElementById('login-pw').value;
+  const errEl=document.getElementById('login-err');
+  const btn=document.getElementById('login-btn');
+  errEl.style.display='none';
+  if(!email||!pw){errEl.textContent='Please enter your email and password.';errEl.style.display='block';return;}
+  btn.disabled=true;btn.innerHTML='<div class="spinner" style="width:18px;height:18px;border-width:2px"></div> Signing in...';
+  try{
+    const hash=await hashPassword(pw);
+    // Check master admin (stored with special marker)
+    const users=await sbGet('rd_users',`email=eq.${encodeURIComponent(email)}&is_active=eq.true`);
+    if(!users||!users.length){throw new Error('No active account found for this email.');}
+    const user=users[0];
+    // Verify password — support both master marker and hashed
+    let valid=false;
+    if(user.password_hash.startsWith('MASTER_ADMIN_')){
+      // First login — hash the plain password stored after marker
+      const plainPw=user.password_hash.replace('MASTER_ADMIN_','');
+      valid=(pw===plainPw);
+      if(valid){
+        // Upgrade to proper hash
+        const properHash=await hashPassword(pw);
+        await sbPatch('rd_users','id=eq.'+user.id,{password_hash:properHash});
+      }
+    } else {
+      valid=(hash===user.password_hash);
+    }
+    if(!valid) throw new Error('Incorrect password. Please try again.');
+    currentUser={id:user.id,name:user.name,email:user.email,role:user.role};
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('main-app').style.display='flex';
+    setupAppUI();
+    await loadRates();
+    if(currentUser.role==='admin') loadOpenBadge();
+  }catch(e){
+    errEl.textContent=e.message;errEl.style.display='block';
+  }finally{
+    btn.disabled=false;btn.innerHTML='Sign In <i class="ti ti-arrow-right"></i>';
+  }
+}
+function doLogout(){
+  currentUser=null;quoteLines=[];filterState={search:'',cat:'',exp:'',eng:''};
+  reqSkillRows=[{id:1,skill:'',exp:'',engagement:'ft',roleType:'Developer',jd:'',file:null,fileName:''}];reqSkillId=2;
+  document.getElementById('main-app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pw').value='';
+  document.getElementById('login-err').style.display='none';
+}
+function setupAppUI(){
+  const isAdmin=currentUser.role==='admin';
+  const initials=currentUser.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-avatar').textContent=initials;
+  document.getElementById('user-name-display').textContent=currentUser.name;
+  document.getElementById('user-role-display').textContent=isAdmin?'Pricing Admin':'Sales / Delivery';
+  ['admin','analytics','requests_admin','users','auditlog'].forEach(p=>{
+    document.getElementById('nav-'+p).classList.toggle('disabled',!isAdmin);
+  });
+}
+
+// ── RATE DATA ─────────────────────────────────────────────────
+const SEED=[
+  {id:1,category:'PHP Developer',role:'PHP Developer',exp:'3-5 yrs',ft:899,pt:499,hr:29.22,ctc:null},
+  {id:2,category:'PHP Developer',role:'PHP Developer',exp:'5-7 yrs',ft:999,pt:549,hr:32.47,ctc:null},
+  {id:3,category:'PHP Developer',role:'PHP Developer',exp:'7-9 yrs',ft:1199,pt:649,hr:38.97,ctc:null},
+  {id:4,category:'WordPress Developer',role:'WordPress Developer',exp:'3-5 yrs',ft:899,pt:499,hr:29.22,ctc:null},
+  {id:5,category:'WordPress Developer',role:'WordPress Developer',exp:'5-7 yrs',ft:999,pt:549,hr:32.47,ctc:null},
+  {id:6,category:'WordPress Developer',role:'WordPress Developer',exp:'7-9 yrs',ft:1199,pt:649,hr:38.97,ctc:null},
+  {id:7,category:'UI/UX Designer',role:'UI/UX Designer',exp:'3-5 yrs',ft:899,pt:499,hr:29.22,ctc:null},
+  {id:8,category:'UI/UX Designer',role:'UI/UX Designer',exp:'5-7 yrs',ft:999,pt:549,hr:32.47,ctc:null},
+  {id:9,category:'UI/UX Designer',role:'UI/UX Designer',exp:'7-9 yrs',ft:1199,pt:649,hr:38.97,ctc:null},
+  {id:10,category:'Manual QA',role:'Manual QA Engineer',exp:'3-5 yrs',ft:899,pt:499,hr:29.22,ctc:null},
+  {id:11,category:'Manual QA',role:'Manual QA Engineer',exp:'5-7 yrs',ft:999,pt:549,hr:32.47,ctc:null},
+  {id:12,category:'Manual QA',role:'Manual QA Engineer',exp:'7-9 yrs',ft:1199,pt:649,hr:38.97,ctc:null},
+  {id:13,category:'.NET Developer',role:'.NET Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:14,category:'.NET Developer',role:'.NET Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:15,category:'.NET Developer',role:'.NET Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:16,category:'Automation QA',role:'Automation QA Engineer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:17,category:'Automation QA',role:'Automation QA Engineer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:18,category:'Automation QA',role:'Automation QA Engineer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:19,category:'Android Developer',role:'Android Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:20,category:'Android Developer',role:'Android Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:21,category:'Android Developer',role:'Android Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:22,category:'iOS Developer',role:'iOS Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:23,category:'iOS Developer',role:'iOS Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:24,category:'iOS Developer',role:'iOS Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:25,category:'Flutter Developer',role:'Flutter Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:26,category:'Flutter Developer',role:'Flutter Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:27,category:'Flutter Developer',role:'Flutter Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:28,category:'BI Developer',role:'BI Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:29,category:'BI Developer',role:'BI Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:30,category:'BI Developer',role:'BI Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:31,category:'Power BI Developer',role:'Power BI Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:32,category:'Power BI Developer',role:'Power BI Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:33,category:'Power BI Developer',role:'Power BI Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:34,category:'Angular Developer',role:'Angular Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:35,category:'Angular Developer',role:'Angular Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:36,category:'Angular Developer',role:'Angular Developer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:37,category:'DevOps Engineer',role:'DevOps Engineer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1227135},
+  {id:38,category:'DevOps Engineer',role:'DevOps Engineer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1363635},
+  {id:39,category:'DevOps Engineer',role:'DevOps Engineer',exp:'7-9 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:40,category:'React Developer',role:'React Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1363635},
+  {id:41,category:'React Developer',role:'React Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1636635},
+  {id:42,category:'React Developer',role:'React Developer',exp:'7-9 yrs',ft:1499,pt:799,hr:48.72,ctc:1909635},
+  {id:43,category:'Vue.js Developer',role:'Vue.js Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1363635},
+  {id:44,category:'Vue.js Developer',role:'Vue.js Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1636635},
+  {id:45,category:'Vue.js Developer',role:'Vue.js Developer',exp:'7-9 yrs',ft:1499,pt:799,hr:48.72,ctc:1909635},
+  {id:46,category:'React Native Developer',role:'React Native Developer',exp:'3-5 yrs',ft:999,pt:549,hr:32.47,ctc:1363635},
+  {id:47,category:'React Native Developer',role:'React Native Developer',exp:'5-7 yrs',ft:1199,pt:649,hr:38.97,ctc:1636635},
+  {id:48,category:'React Native Developer',role:'React Native Developer',exp:'7-9 yrs',ft:1499,pt:799,hr:48.72,ctc:1909635},
+  {id:49,category:'Node.js Developer',role:'Node.js Developer',exp:'3-5 yrs',ft:1099,pt:599,hr:35.72,ctc:1363635},
+  {id:50,category:'Node.js Developer',role:'Node.js Developer',exp:'5-7 yrs',ft:1399,pt:749,hr:45.47,ctc:1636635},
+  {id:51,category:'Node.js Developer',role:'Node.js Developer',exp:'7-9 yrs',ft:1699,pt:999,hr:55.22,ctc:2046135},
+  {id:52,category:'RPA Developer',role:'RPA Automation Engineer',exp:'3-5 yrs',ft:899,pt:499,hr:29.22,ctc:1500135},
+  {id:53,category:'RPA Developer',role:'RPA Automation Engineer',exp:'5-7 yrs',ft:1099,pt:599,hr:35.72,ctc:1909635},
+  {id:54,category:'RPA Developer',role:'RPA Automation Engineer',exp:'7-9 yrs',ft:1299,pt:699,hr:42.22,ctc:2319135},
+  {id:55,category:'Remote IT Services',role:'Remote IT Services',exp:'3-5 yrs',ft:799,pt:399,hr:25.97,ctc:1227135},
+  {id:56,category:'Remote IT Services',role:'Remote IT Services',exp:'5-7 yrs',ft:999,pt:549,hr:32.47,ctc:1500135},
+  {id:57,category:'Remote IT Services',role:'Remote IT Services',exp:'7-9 yrs',ft:1299,pt:699,hr:42.22,ctc:1773135},
+  {id:58,category:'SQL Developer',role:'SQL Developer',exp:'3-5 yrs',ft:1299,pt:649,hr:42.22,ctc:780000},
+  {id:59,category:'SQL Developer',role:'SQL Developer',exp:'5-7 yrs',ft:1499,pt:799,hr:48.72,ctc:1170000},
+  {id:60,category:'SQL Developer',role:'SQL Developer',exp:'7-9 yrs',ft:1699,pt:999,hr:55.22,ctc:1580000},
+  {id:61,category:'Database Administrator',role:'Database Administrator',exp:'3-5 yrs',ft:1299,pt:649,hr:42.22,ctc:780000},
+  {id:62,category:'Database Administrator',role:'Database Administrator',exp:'5-7 yrs',ft:1499,pt:799,hr:48.72,ctc:1170000},
+  {id:63,category:'Database Administrator',role:'Database Administrator',exp:'7-9 yrs',ft:1699,pt:999,hr:55.22,ctc:1580000},
+  {id:64,category:'Project Manager',role:'Project Manager',exp:'8-10 yrs',ft:1599,pt:949,hr:51.97,ctc:1773135},
+  {id:65,category:'Project Manager',role:'Project Manager',exp:'10-12 yrs',ft:1899,pt:1049,hr:61.72,ctc:2046135},
+  {id:66,category:'Project Manager',role:'Project Manager',exp:'12-14 yrs',ft:2199,pt:1249,hr:71.47,ctc:2319135},
+  {id:67,category:'Scrum Master',role:'Scrum Master',exp:'8-10 yrs',ft:1599,pt:949,hr:51.97,ctc:1773135},
+  {id:68,category:'Scrum Master',role:'Scrum Master',exp:'10-12 yrs',ft:1899,pt:1049,hr:61.72,ctc:2046135},
+  {id:69,category:'Scrum Master',role:'Scrum Master',exp:'12-14 yrs',ft:2199,pt:1249,hr:71.47,ctc:2319135},
+  {id:70,category:'Tech Lead',role:'Tech Lead',exp:'8-10 yrs',ft:1499,pt:849,hr:48.72,ctc:2182635},
+  {id:71,category:'Tech Lead',role:'Tech Lead',exp:'10-12 yrs',ft:1799,pt:1049,hr:58.47,ctc:2592135},
+  {id:72,category:'Tech Lead',role:'Tech Lead',exp:'12-14 yrs',ft:2099,pt:1199,hr:68.22,ctc:3001635},
+  {id:73,category:'Tech Architect',role:'Tech Architect',exp:'8-10 yrs',ft:1899,pt:1049,hr:61.72,ctc:2046135},
+  {id:74,category:'Tech Architect',role:'Tech Architect',exp:'10-12 yrs',ft:2199,pt:1249,hr:71.47,ctc:2455635},
+  {id:75,category:'Tech Architect',role:'Tech Architect',exp:'12-14 yrs',ft:2499,pt:1399,hr:81.22,ctc:2865135},
+  {id:76,category:'System Analyst',role:'System Analyst',exp:'8-10 yrs',ft:1899,pt:1049,hr:61.72,ctc:2046135},
+  {id:77,category:'System Analyst',role:'System Analyst',exp:'10-12 yrs',ft:2199,pt:1249,hr:71.47,ctc:2455635},
+  {id:78,category:'System Analyst',role:'System Analyst',exp:'12-14 yrs',ft:2499,pt:1399,hr:81.22,ctc:2865135},
+  {id:79,category:'Business Analyst',role:'Business Analyst',exp:'8-10 yrs',ft:1899,pt:1049,hr:61.72,ctc:2046135},
+  {id:80,category:'Business Analyst',role:'Business Analyst',exp:'10-12 yrs',ft:2199,pt:1249,hr:71.47,ctc:2455635},
+  {id:81,category:'Business Analyst',role:'Business Analyst',exp:'12-14 yrs',ft:2499,pt:1399,hr:81.22,ctc:2865135},
+  {id:82,category:'Full Stack Developer',role:'Full Stack Developer',exp:'4-6 yrs',ft:1649,pt:999,hr:53.59,ctc:2592135},
+  {id:83,category:'Full Stack Developer',role:'Full Stack Developer',exp:'6-8 yrs',ft:1899,pt:1149,hr:61.72,ctc:3411135},
+  {id:84,category:'Java Developer',role:'Java Developer',exp:'4-6 yrs',ft:1299,pt:699,hr:42.22,ctc:2250885},
+  {id:85,category:'Java Developer',role:'Java Developer',exp:'6-8 yrs',ft:1499,pt:799,hr:48.72,ctc:2592135},
+  {id:86,category:'Python Developer',role:'Python Developer',exp:'3-4 yrs',ft:1099,pt:599,hr:35.72,ctc:1300000},
+  {id:87,category:'Python Developer',role:'Python Developer',exp:'4-6 yrs',ft:1299,pt:699,hr:42.22,ctc:1750000},
+  {id:88,category:'Python Developer',role:'Python Developer',exp:'6-8 yrs',ft:1599,pt:849,hr:51.97,ctc:2200000},
+  {id:89,category:'AI/ML Engineer',role:'AI/ML Engineer',exp:'3-4 yrs',ft:1099,pt:599,hr:35.72,ctc:1300000},
+  {id:90,category:'AI/ML Engineer',role:'AI/ML Engineer',exp:'4-6 yrs',ft:1299,pt:699,hr:42.22,ctc:1750000},
+  {id:91,category:'AI/ML Engineer',role:'AI/ML Engineer',exp:'6-8 yrs',ft:1599,pt:849,hr:51.97,ctc:2200000}
+];
+
+async function loadRates(){
+  const c=document.getElementById('content');
+  c.innerHTML=`<div class="loading-screen"><div class="spinner"></div><span>Loading...</span></div>`;
+  try{
+    let data=await sbGet('rates','order=id.asc&limit=200');
+    if(!data||!data.length){
+      c.innerHTML=`<div class="loading-screen"><div class="spinner"></div><span>Setting up database...</span></div>`;
+      await sbPost('rates',SEED,'');
+      data=await sbGet('rates','order=id.asc&limit=200');
+    }
+    rateData=data;
+    showPage(currentPage);
+  }catch(e){
+    c.innerHTML=`<div class="loading-screen" style="color:#dc2626"><i class="ti ti-alert-triangle" style="font-size:32px"></i><span>${e.message}</span><button class="btn btn-primary btn-sm" onclick="loadRates()">Retry</button></div>`;
+  }
+}
+
+// ── NAVIGATION ────────────────────────────────────────────────
+function showPage(page){
+  const adminPages=['admin','analytics','requests_admin','users','auditlog'];
+  if(adminPages.includes(page)&&currentUser?.role!=='admin'){showToast('Admin access required','#dc2626');return;}
+  currentPage=page;
+  ['explorer','quote','request','admin','analytics','requests_admin','users','auditlog'].forEach(p=>{
+    const el=document.getElementById('nav-'+p); if(el) el.classList.toggle('active',p===page);
+  });
+  const titles={
+    explorer:['Rate Explorer','Browse and filter all available rates'],
+    quote:['Quote Builder','Build a multi-role quote and export to CSV'],
+    request:['Rate Request','Submit a new rate request for unlisted skills'],
+    admin:['Rate Management','Edit rates and CTC — changes auto-save to database'],
+    analytics:['Analytics & Insights','Commercial overview and margin spread'],
+    requests_admin:['Rate Requests','Review and close incoming requests from sales'],
+    users:['User Management','Create, edit and manage user accounts'],
+    auditlog:['Change Log','Full history of all rate changes and edits']
+  };
+  document.getElementById('page-title').textContent=titles[page][0];
+  document.getElementById('page-sub').textContent=titles[page][1];
+  const actions=document.getElementById('topbar-actions');
+  const dot=document.getElementById('saving-dot');
+  actions.innerHTML=''; actions.appendChild(dot);
+  if(page==='quote'){
+    const btn=document.createElement('button');
+    btn.className='btn btn-primary btn-sm';
+    btn.innerHTML='<i class="ti ti-download"></i> Export CSV';
+    btn.onclick=exportQuote; actions.appendChild(btn);
+  }
+  if(page==='users'){
+    const btn=document.createElement('button');
+    btn.className='btn btn-primary btn-sm';
+    btn.innerHTML='<i class="ti ti-user-plus"></i> Add User';
+    btn.onclick=()=>showAddUserModal(); actions.appendChild(btn);
+  }
+  const c=document.getElementById('content');
+  if(page==='explorer') renderExplorer(c);
+  else if(page==='quote') renderQuote(c);
+  else if(page==='request') renderRequest(c);
+  else if(page==='admin') renderAdmin(c);
+  else if(page==='analytics') renderAnalytics(c);
+  else if(page==='requests_admin') renderRequestsAdmin(c);
+  else if(page==='users') renderUsers(c);
+  else if(page==='auditlog') renderAuditLog(c);
+}
+
+// ── EXPLORER ──────────────────────────────────────────────────
+function getCategories(){return[...new Set(rateData.map(r=>r.category))].sort();}
+function getExps(){return[...new Set(rateData.map(r=>r.exp))];}
+function getFiltered(){
+  return rateData.filter(r=>{
+    const s=filterState.search.toLowerCase();
+    if(s&&!r.role.toLowerCase().includes(s)&&!r.category.toLowerCase().includes(s)) return false;
+    if(filterState.cat&&r.category!==filterState.cat) return false;
+    if(filterState.exp&&r.exp!==filterState.exp) return false;
+    return true;
+  });
+}
+function renderExplorer(c){
+  const cats=getCategories(),exps=getExps(),filtered=getFiltered(),eng=filterState.eng;
+  c.innerHTML=`
+  <div class="section-hd">Rate Card</div>
+  <div class="section-sd">Billing rates for sales and delivery. Internal costs are not visible here.</div>
+  <div class="filters">
+    <div class="fg" style="flex:2"><label>Search</label>
+      <div class="search-wrap"><i class="ti ti-search search-icon"></i>
+        <input type="text" placeholder="Role or skill..." value="${filterState.search}"
+          oninput="filterState.search=this.value;renderExplorer(document.getElementById('content'))">
+      </div></div>
+    <div class="fg"><label>Skill</label>
+      <select onchange="filterState.cat=this.value;renderExplorer(document.getElementById('content'))">
+        <option value="">All Skills</option>
+        ${cats.map(cat=>`<option value="${cat}" ${filterState.cat===cat?'selected':''}>${cat}</option>`).join('')}
+      </select></div>
+    <div class="fg"><label>Experience</label>
+      <select onchange="filterState.exp=this.value;renderExplorer(document.getElementById('content'))">
+        <option value="">All Levels</option>
+        ${exps.map(e=>`<option value="${e}" ${filterState.exp===e?'selected':''}>${e}</option>`).join('')}
+      </select></div>
+    <div class="fg"><label>Engagement</label>
+      <select onchange="filterState.eng=this.value;renderExplorer(document.getElementById('content'))">
+        <option value="">All Types</option>
+        <option value="ft">Full Time</option><option value="pt">Part Time</option><option value="hr">Hourly</option>
+      </select></div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr>
+      <th>Role</th><th>Experience</th>
+      ${!eng||eng==='ft'?'<th>Full Time / wk</th>':''}
+      ${!eng||eng==='pt'?'<th>Part Time / wk</th>':''}
+      ${!eng||eng==='hr'?'<th>Hourly Rate</th>':''}
+      <th></th>
+    </tr></thead>
+    <tbody>
+    ${filtered.length===0?`<tr><td colspan="6" style="text-align:center;padding:30px;color:var(--text3)">No roles match your filters</td></tr>`:''}
+    ${filtered.map(r=>`<tr>
+      <td style="color:var(--text);font-weight:600">${r.role}</td>
+      <td><span class="badge badge-exp">${r.exp}</span></td>
+      ${!eng||eng==='ft'?`<td style="color:#e8431c;font-weight:600">${fmt(r.ft)}</td>`:''}
+      ${!eng||eng==='pt'?`<td style="color:#d97706;font-weight:600">${fmt(r.pt)}</td>`:''}
+      ${!eng||eng==='hr'?`<td style="color:#16a34a;font-weight:600">$${r.hr.toFixed(2)}/hr</td>`:''}
+      <td><button class="btn btn-ghost btn-sm" onclick="addToQuote(${r.id})"><i class="ti ti-plus"></i> Add</button></td>
+    </tr>`).join('')}
+    </tbody>
+  </table></div>
+  <div class="note-bar">Showing ${filtered.length} of ${rateData.length} roles</div>`;
+}
+function addToQuote(id){
+  const r=rateData.find(x=>x.id===id);
+  quoteLines.push({id:nextLineId++,roleId:r.id,role:r.role,exp:r.exp,eng:'ft',qty:1,weeks:4});
+  showToast(r.role+' added to quote');showPage('quote');
+}
+
+// ── QUOTE BUILDER ─────────────────────────────────────────────
+function renderQuote(c){
+  const roles=[...new Set(rateData.map(r=>r.role))];
+  const total=quoteLines.reduce((s,l)=>{
+    const r=rateData.find(x=>x.id===l.roleId);if(!r) return s;
+    return s+(l.eng==='hr'?r.hr*l.weeks:(l.eng==='pt'?r.pt:r.ft)*l.weeks)*l.qty;
+  },0);
+  c.innerHTML=`
+  <div class="section-hd">Quote Builder</div>
+  <div class="section-sd">Compose a multi-role quote. Export to CSV for client sharing.</div>
+  ${!quoteLines.length?`<div class="add-line-area" onclick="addBlankLine()"><i class="ti ti-plus" style="font-size:22px;display:block;margin-bottom:8px"></i>Click to add a line item</div>`:''}
+  <div id="ql-container">${quoteLines.map(l=>renderLineHTML(l,roles)).join('')}</div>
+  ${quoteLines.length?`
+  <div class="add-line-area" onclick="addBlankLine()"><i class="ti ti-plus"></i> Add another role</div>
+  <div class="quote-total-bar">
+    <div class="qtb-row"><span class="qtb-label">Total Resources</span><span class="qtb-val">${quoteLines.reduce((s,l)=>s+l.qty,0)}</span></div>
+    <div class="qtb-row"><span class="qtb-label">Max Duration</span><span class="qtb-val">${Math.max(...quoteLines.map(l=>l.weeks))} ${quoteLines.every(l=>l.eng==='hr')?'hrs':'wks'}</span></div>
+    <div class="qtb-row"><span class="qtb-label" style="font-size:15px;font-weight:600;color:#fff">Total Quote Value</span><span class="qtb-val big">${fmt(total)}</span></div>
+  </div>`:''}`;
+}
+function renderLineHTML(l,roles){
+  const r=rateData.find(x=>x.id===l.roleId);
+  const isHr=l.eng==='hr';
+  const unitRate=r?(isHr?r.hr:l.eng==='pt'?r.pt:r.ft):0;
+  const lineTotal=r?(isHr?r.hr*l.weeks:unitRate*l.weeks)*l.qty:0;
+  const exps=r?rateData.filter(x=>x.role===r.role).map(x=>x.exp):[];
+  return `<div class="quote-line"><div class="ql-grid">
+    <div><div class="ql-label">Role</div>
+      <select onchange="qlUpdate(${l.id},'role',this.value)">
+        ${roles.map(ro=>`<option value="${ro}" ${ro===l.role?'selected':''}>${ro}</option>`).join('')}
+      </select></div>
+    <div><div class="ql-label">Experience</div>
+      <select onchange="qlUpdate(${l.id},'exp',this.value)">
+        ${exps.map(e=>`<option value="${e}" ${e===l.exp?'selected':''}>${e}</option>`).join('')}
+      </select></div>
+    <div><div class="ql-label">Engagement</div>
+      <select onchange="qlUpdate(${l.id},'eng',this.value)">
+        <option value="ft" ${l.eng==='ft'?'selected':''}>Full Time</option>
+        <option value="pt" ${l.eng==='pt'?'selected':''}>Part Time</option>
+        <option value="hr" ${l.eng==='hr'?'selected':''}>Hourly</option>
+      </select></div>
+    <div><div class="ql-label">Unit Rate</div>
+      <div style="padding:8px 0;font-size:13px;font-weight:600;color:var(--navy)">${isHr?'$'+unitRate.toFixed(2)+'/hr':'$'+unitRate+'/wk'}</div></div>
+    <div><div class="ql-label">Qty</div><input type="number" min="1" value="${l.qty}" onchange="qlUpdate(${l.id},'qty',this.value)"></div>
+    <div><div class="ql-label">${isHr?'Hours':'Weeks'}</div><input type="number" min="1" value="${l.weeks}" onchange="qlUpdate(${l.id},'weeks',this.value)"></div>
+    <div><div class="ql-label">Line Total</div><div style="font-size:16px;font-weight:700;color:#e8431c;padding:8px 0">${fmt(lineTotal)}</div></div>
+    <div class="del-btn" onclick="removeLine(${l.id})"><i class="ti ti-trash"></i></div>
+  </div></div>`;
+}
+function addBlankLine(){
+  const r=rateData[0];
+  quoteLines.push({id:nextLineId++,roleId:r.id,role:r.role,exp:r.exp,eng:'ft',qty:1,weeks:4});
+  renderQuote(document.getElementById('content'));
+}
+function qlUpdate(id,field,val){
+  const l=quoteLines.find(x=>x.id===id);if(!l) return;
+  if(field==='role'){const m=rateData.find(r=>r.role===val);if(m){l.role=val;l.roleId=m.id;l.exp=m.exp;}}
+  else if(field==='exp'){l.exp=val;const m=rateData.find(r=>r.role===l.role&&r.exp===val);if(m)l.roleId=m.id;}
+  else if(field==='qty')l.qty=Math.max(1,parseInt(val)||1);
+  else if(field==='weeks')l.weeks=Math.max(1,parseInt(val)||1);
+  else l[field]=val;
+  renderQuote(document.getElementById('content'));
+}
+function removeLine(id){quoteLines=quoteLines.filter(l=>l.id!==id);renderQuote(document.getElementById('content'));}
+function exportQuote(){
+  if(!quoteLines.length){showToast('Add at least one line item','#dc2626');return;}
+  const rows=[['Quote Export — RateDesk'],['Generated:',new Date().toLocaleDateString('en-IN')],['Prepared by:',currentUser.name],[''],
+    ['Role','Experience','Engagement','Qty','Duration','Unit Rate','Line Total']];
+  let total=0;
+  quoteLines.forEach(l=>{
+    const r=rateData.find(x=>x.id===l.roleId);if(!r)return;
+    const isHr=l.eng==='hr';
+    const rate=isHr?r.hr:l.eng==='pt'?r.pt:r.ft;
+    const lt=(isHr?r.hr*l.weeks:rate*l.weeks)*l.qty;total+=lt;
+    rows.push([r.role,l.exp,l.eng==='ft'?'Full Time':l.eng==='pt'?'Part Time':'Hourly',l.qty,
+      isHr?l.weeks+' hrs':l.weeks+' wks','$'+(isHr?rate.toFixed(2):rate),'$'+Math.round(lt).toLocaleString()]);
+  });
+  rows.push(['','','','','','Total','$'+Math.round(total).toLocaleString()]);
+  const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download='quote_'+Date.now()+'.csv';a.click();
+  showToast('Quote exported');
+}
+
+// ── RATE REQUEST (SALES) ──────────────────────────────────────
+const DEV_EXPS=['3-5 yrs','5-7 yrs','7-9 yrs','3-4 yrs','4-6 yrs','6-8 yrs'];
+const MGR_EXPS=['8-10 yrs','10-12 yrs','12-14 yrs'];
+
+function renderRequest(c){
+  c.innerHTML=`
+  <div class="section-hd">Rate Request</div>
+  <div class="section-sd">Submit a request for skills not in the rate card. Attach the JD as a PDF or Word document.</div>
+  <div id="req-confirm-banner" style="display:none"></div>
+  <div class="card" style="margin-bottom:14px" id="req-details-card">
+    <div class="card-title"><i class="ti ti-user"></i> Your Details</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px">
+      <div><label>Your Name *</label><input type="text" id="req-name" value="${currentUser.name}" placeholder="Your full name"></div>
+      <div><label>Your Email *</label><input type="email" id="req-email" value="${currentUser.email}" readonly style="background:var(--surface2);color:var(--text3)"></div>
+      <div><label>Geography *</label>
+        <select id="req-geo">
+          <option value="">Select geography</option>
+          <option value="United States">United States</option>
+          <option value="Saudi Arabia">Saudi Arabia</option>
+        </select></div>
+      <div><label>Notes (optional)</label><input type="text" id="req-notes" placeholder="Client name, urgency..."></div>
+    </div>
+  </div>
+  <div class="card" id="req-skills-card">
+    <div class="card-title"><i class="ti ti-list"></i> Skills Required
+      <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="addSkillRow()"><i class="ti ti-plus"></i> Add Skill</button>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:12px">All fields are required. Upload JD as PDF or Word (.doc/.docx).</div>
+    <div id="skill-rows">${reqSkillRows.map(r=>skillRowHTML(r)).join('')}</div>
+  </div>
+  <div style="margin-top:16px;display:flex;justify-content:flex-end;gap:10px">
+    <button class="btn btn-ghost" onclick="resetRequestForm()">Clear</button>
+    <button class="btn btn-primary" id="submit-req-btn" onclick="submitRequest()"><i class="ti ti-send"></i> Submit Request</button>
+  </div>
+  <div style="margin-top:28px">
+    <div style="font-size:15px;font-weight:700;color:var(--navy);margin-bottom:12px">My Previous Requests</div>
+    <div id="my-requests-list"><div class="loading-screen" style="height:80px"><div class="spinner"></div></div></div>
+  </div>`;
+  loadMyRequests();
+}
+
+function skillRowHTML(r){
+  const exps=r.roleType==='Managerial'?MGR_EXPS:DEV_EXPS;
+  const validExp=exps.includes(r.exp)?r.exp:'';
+  return `<div style="border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px" id="sr-${r.id}">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 36px;gap:10px;margin-bottom:10px;align-items:start">
+      <div>
+        <label>Skill / Role *</label>
+        <input type="text" placeholder="e.g. Salesforce Developer" value="${r.skill}"
+          style="border-color:${r.skill?'var(--border)':'#fca5a5'}"
+          oninput="updateSkillRow(${r.id},'skill',this.value)">
+      </div>
+      <div>
+        <label>Role Type *</label>
+        <div style="display:flex;gap:6px;margin-top:2px">
+          <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-size:12px;font-weight:600;
+            border:1.5px solid ${r.roleType==='Developer'?'var(--accent)':'var(--border)'};
+            background:${r.roleType==='Developer'?'#fff5f3':'var(--surface2)'};
+            color:${r.roleType==='Developer'?'var(--accent)':'var(--text2)'};
+            border-radius:7px;padding:7px 4px;transition:all .15s">
+            <input type="radio" name="rt-${r.id}" value="Developer" ${r.roleType==='Developer'?'checked':''}
+              onchange="updateSkillRow(${r.id},'roleType','Developer')" style="width:auto;margin:0">
+            Developer
+          </label>
+          <label style="flex:1;display:flex;align-items:center;justify-content:center;gap:5px;cursor:pointer;font-size:12px;font-weight:600;
+            border:1.5px solid ${r.roleType==='Managerial'?'var(--accent)':'var(--border)'};
+            background:${r.roleType==='Managerial'?'#fff5f3':'var(--surface2)'};
+            color:${r.roleType==='Managerial'?'var(--accent)':'var(--text2)'};
+            border-radius:7px;padding:7px 4px;transition:all .15s">
+            <input type="radio" name="rt-${r.id}" value="Managerial" ${r.roleType==='Managerial'?'checked':''}
+              onchange="updateSkillRow(${r.id},'roleType','Managerial')" style="width:auto;margin:0">
+            Managerial
+          </label>
+        </div>
+      </div>
+      <div>
+        <label>Experience *</label>
+        <select onchange="updateSkillRow(${r.id},'exp',this.value)"
+          style="border-color:${validExp?'var(--border)':'#fca5a5'}">
+          <option value="">Select exp</option>
+          ${exps.map(e=>`<option value="${e}" ${validExp===e?'selected':''}>${e}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label>Engagement *</label>
+        <select onchange="updateSkillRow(${r.id},'engagement',this.value)">
+          <option value="ft" ${r.engagement==='ft'?'selected':''}>Full Time</option>
+          <option value="pt" ${r.engagement==='pt'?'selected':''}>Part Time</option>
+          <option value="hr" ${r.engagement==='hr'?'selected':''}>Hourly</option>
+        </select>
+      </div>
+      <div style="display:flex;align-items:flex-end;padding-bottom:2px">
+        <div class="del-btn" onclick="removeSkillRow(${r.id})"><i class="ti ti-trash"></i></div>
+      </div>
+    </div>
+    <div>
+      <label>Job Description * (PDF or Word only)</label>
+      <div class="file-upload-zone ${r.fileName?'has-file':''}" onclick="document.getElementById('jd-file-${r.id}').click()">
+        <input type="file" id="jd-file-${r.id}" accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          style="display:none" onchange="handleFileSelect(${r.id},this)">
+        ${r.fileName
+          ? `<i class="ti ti-file-check" style="font-size:20px;color:#16a34a;display:block;margin-bottom:4px"></i>
+             <div style="font-size:13px;font-weight:600;color:#166534">${r.fileName}</div>
+             <div style="font-size:11px;color:#16a34a;margin-top:2px">Click to replace</div>`
+          : `<i class="ti ti-upload" style="font-size:20px;color:var(--text3);display:block;margin-bottom:4px"></i>
+             <div style="font-size:13px;color:var(--text3)">Click to upload JD</div>
+             <div style="font-size:11px;color:var(--text3);margin-top:2px">PDF or Word document</div>`
+        }
+      </div>
+    </div>
+  </div>`;
+}
+
+function handleFileSelect(rowId, input){
+  const file=input.files[0];if(!file) return;
+  const allowed=['application/pdf','application/msword','application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  if(!allowed.includes(file.type)&&!file.name.match(/\.(pdf|doc|docx)$/i)){
+    showToast('Only PDF or Word files allowed','#dc2626');input.value='';return;
+  }
+  if(file.size>10*1024*1024){showToast('File must be under 10MB','#dc2626');input.value='';return;}
+  const r=reqSkillRows.find(x=>x.id===rowId);if(!r) return;
+  r.file=file;r.fileName=file.name;
+  document.getElementById('sr-'+rowId).outerHTML=skillRowHTML(r);
+  // Re-attach file to input after re-render
+  const newInput=document.getElementById('jd-file-'+rowId);
+  const dt=new DataTransfer();dt.items.add(file);newInput.files=dt.files;
+}
+
+function addSkillRow(){
+  reqSkillRows.push({id:reqSkillId++,skill:'',exp:'',engagement:'ft',roleType:'Developer',file:null,fileName:''});
+  document.getElementById('skill-rows').innerHTML=reqSkillRows.map(r=>skillRowHTML(r)).join('');
+}
+function removeSkillRow(id){
+  if(reqSkillRows.length===1){showToast('At least one skill required','#dc2626');return;}
+  reqSkillRows=reqSkillRows.filter(r=>r.id!==id);
+  document.getElementById('skill-rows').innerHTML=reqSkillRows.map(r=>skillRowHTML(r)).join('');
+}
+function updateSkillRow(id,field,val){
+  const r=reqSkillRows.find(x=>x.id===id);if(!r) return;
+  r[field]=val;
+  if(field==='roleType'){r.exp='';document.getElementById('sr-'+id).outerHTML=skillRowHTML(r);}
+}
+
+async function submitRequest(){
+  const name=document.getElementById('req-name').value.trim();
+  const email=currentUser.email;
+  const geo=document.getElementById('req-geo').value;
+  const notes=document.getElementById('req-notes').value.trim();
+  if(!name){showToast('Please enter your name','#dc2626');return;}
+  if(!geo){showToast('Please select a geography','#dc2626');return;}
+  const invalid=reqSkillRows.filter(r=>!r.skill.trim()||!r.exp||!r.roleType||!r.file);
+  if(invalid.length){
+    showToast('All fields and JD file are required for every skill','#dc2626');
+    document.getElementById('skill-rows').innerHTML=reqSkillRows.map(r=>skillRowHTML(r)).join('');
+    return;
+  }
+  const btn=document.getElementById('submit-req-btn');
+  btn.disabled=true;btn.innerHTML='<div class="spinner" style="width:16px;height:16px;border-width:2px"></div> Submitting...';
+  try{
+    const ref=genRef();
+    const reqArr=await sbPost('rate_requests',{ref_no:ref,manager_name:name,manager_email:email,user_id:currentUser.id,geography:geo,notes:notes,status:'Open'});
+    const reqRecord=Array.isArray(reqArr)?reqArr[0]:reqArr;
+    // Upload files and insert skill records
+    for(const s of reqSkillRows){
+      const ext=s.file.name.split('.').pop();
+      const filePath=`${reqRecord.id}/${s.id}_${Date.now()}.${ext}`;
+      await uploadFile(filePath,s.file);
+      await sbPost('request_skills',{request_id:reqRecord.id,skill:s.skill.trim(),role_type:s.roleType,
+        exp_range:s.exp,engagement:s.engagement,jd_file_name:s.file.name,jd_file_path:filePath,status:'Open'});
+    }
+    // Show confirmation
+    document.getElementById('req-details-card').style.display='none';
+    document.getElementById('req-skills-card').style.display='none';
+    document.querySelector('[onclick="submitRequest()"]').closest('div').style.display='none';
+    document.getElementById('req-confirm-banner').style.display='block';
+    document.getElementById('req-confirm-banner').innerHTML=`
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:28px;text-align:center;margin-bottom:20px">
+        <i class="ti ti-circle-check" style="font-size:48px;color:#16a34a;display:block;margin-bottom:12px"></i>
+        <div style="font-size:18px;font-weight:700;color:#166534;margin-bottom:6px">Request Submitted Successfully!</div>
+        <div style="font-size:14px;color:#16a34a;font-weight:600;margin-bottom:8px">Reference: ${ref}</div>
+        <div style="font-size:13px;color:#4a5578;margin-bottom:20px">${reqSkillRows.length} skill${reqSkillRows.length>1?'s':''} submitted · The pricing team will review and respond shortly.</div>
+        <button class="btn btn-primary" onclick="resetRequestForm()"><i class="ti ti-plus"></i> Submit Another Request</button>
+      </div>`;
+    loadMyRequests();
+  }catch(e){
+    showToast('Submission failed: '+e.message,'#dc2626');
+    btn.disabled=false;btn.innerHTML='<i class="ti ti-send"></i> Submit Request';
+  }
+}
+
+function resetRequestForm(){
+  reqSkillRows=[{id:1,skill:'',exp:'',engagement:'ft',roleType:'Developer',file:null,fileName:''}];reqSkillId=2;
+  renderRequest(document.getElementById('content'));
+}
+
+async function loadMyRequests(){
+  const el=document.getElementById('my-requests-list');if(!el) return;
+  try{
+    const reqs=await sbGet('rate_requests',`user_id=eq.${currentUser.id}&order=created_at.desc&limit=20`);
+    if(!reqs.length){el.innerHTML='<div style="color:var(--text3);font-size:13px;padding:10px 0">No previous requests found.</div>';return;}
+    const ids=reqs.map(r=>r.id).join(',');
+    const skills=await sbGet('request_skills',`request_id=in.(${ids})&order=id.asc`);
+    el.innerHTML=reqs.map(r=>{
+      const rs=skills.filter(s=>s.request_id===r.id);
+      const sc=r.status==='Open'?'#e8431c':r.status==='In Review'?'#d97706':'#16a34a';
+      return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <div>
+            <span style="font-weight:700;color:var(--navy)">${r.ref_no}</span>
+            <span style="font-size:11px;color:var(--text3);margin-left:10px">${new Date(r.created_at).toLocaleDateString('en-IN')} · ${r.geography}</span>
+          </div>
+          <span style="font-size:11px;font-weight:700;color:${sc};background:${sc}18;padding:3px 10px;border-radius:20px">${r.status}</span>
+        </div>
+        ${rs.map(s=>{
+          const eng=s.engagement==='ft'?'Full Time':s.engagement==='pt'?'Part Time':'Hourly';
+          const sc2=s.status==='Open'?'#e8431c':s.status==='In Review'?'#d97706':'#16a34a';
+          return `<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr;gap:8px;padding:8px 0;border-top:1px solid var(--border);align-items:center">
+            <div style="font-size:12px;font-weight:600;color:var(--navy)">${s.skill}
+              <span style="font-size:10px;font-weight:500;padding:2px 6px;border-radius:8px;margin-left:4px;background:${s.role_type==='Managerial'?'#eff6ff':'#f0fdf4'};color:${s.role_type==='Managerial'?'#1d4ed8':'#166534'}">${s.role_type}</span>
+            </div>
+            <div style="font-size:11px;color:var(--text2)">${s.exp_range}</div>
+            <div style="font-size:11px;color:var(--text2)">${eng}</div>
+            <div style="font-size:11px;font-weight:600;color:${sc2}">${s.status}${s.quoted_rate?'<br><span style="color:#16a34a">'+s.quoted_rate+'</span>':''}</div>
+            <div style="font-size:11px;color:var(--text3)">${s.jd_file_name}</div>
+          </div>`;
+        }).join('')}
+      </div>`;
+    }).join('');
+  }catch(e){el.innerHTML=`<div style="color:#dc2626;font-size:12px">${e.message}</div>`;}
+}
+
+// ── ADMIN — RATE MANAGEMENT ───────────────────────────────────
+function getFlags(){
+  const flags=[];
+  rateData.forEach(r=>{
+    const m=calcMargin(r);
+    if(m!==null){
+      if(m<20) flags.push({type:'flag-danger',msg:`Very low margin: ${r.role} (${r.exp}) — ${m.toFixed(1)}%`});
+      else if(m<40) flags.push({type:'flag-warn',msg:`Below-target margin: ${r.role} (${r.exp}) — ${m.toFixed(1)}%`});
+    }
+  });
+  const noCtc=rateData.filter(r=>!r.ctc).length;
+  if(noCtc) flags.push({type:'flag-warn',msg:`${noCtc} roles missing CTC data`});
+  return flags;
+}
+function renderAdmin(c){
+  const flags=getFlags();
+  const avgFT=Math.round(rateData.reduce((s,r)=>s+r.ft,0)/rateData.length);
+  const withM=rateData.filter(r=>calcMargin(r)!==null);
+  const avgM=withM.length?(withM.reduce((s,r)=>s+calcMargin(r),0)/withM.length).toFixed(1):'–';
+  c.innerHTML=`
+  <div class="section-hd">Rate Management</div>
+  <div class="section-sd">Edit any value directly — changes auto-save to database and are logged.</div>
+  <div class="grid4" style="margin-bottom:18px">
+    <div class="metric"><div class="metric-label">Total Roles</div><div class="metric-val accent">${rateData.length}</div></div>
+    <div class="metric"><div class="metric-label">Avg FT Rate</div><div class="metric-val accent" id="admin-avg-ft">${fmt(avgFT)}/wk</div></div>
+    <div class="metric"><div class="metric-label">Avg Margin</div><div class="metric-val" id="admin-avg-margin" style="color:${parseFloat(avgM)>50?'#16a34a':parseFloat(avgM)>35?'#d97706':'#dc2626'}">${avgM}%</div></div>
+    <div class="metric"><div class="metric-label">Flags</div><div class="metric-val" id="admin-flags" style="color:${flags.length?'#d97706':'#16a34a'}">${flags.length}</div></div>
+  </div>
+  ${flags.length?`<div class="card" style="margin-bottom:14px"><div class="card-title"><i class="ti ti-alert-triangle"></i> Pricing Flags</div>${flags.map(f=>`<div class="flag ${f.type}"><i class="ti ti-${f.type==='flag-danger'?'x':'alert-triangle'}" style="flex-shrink:0"></i>${f.msg}</div>`).join('')}</div>`:''}
+  <div class="card" style="padding:0;overflow:hidden">
+    <div class="admin-row admin-header"><span>Role</span><span>Exp</span><span>FT Rate ($/wk)</span><span>Annual CTC (₹)</span><span>Weekly Cost</span><span>Margin</span></div>
+    <div style="max-height:500px;overflow-y:auto">
+      ${rateData.map(r=>{
+        const m=calcMargin(r);
+        const mc=m===null?'margin-na':m>55?'margin-good':m>40?'margin-warn':'margin-bad';
+        const wc=r.ctc?'$'+Math.round(r.ctc/WEEKS_YEAR/USD_INR):'—';
+        return `<div class="admin-row" id="ar-${r.id}">
+          <span style="color:var(--navy);font-weight:600;font-size:12px">${r.role}<br><span style="font-weight:400;color:var(--text3);font-size:11px">${r.category}</span></span>
+          <span><span class="badge badge-exp">${r.exp}</span></span>
+          <span><input class="ar-inp" type="number" value="${r.ft}" min="100"
+            onchange="updateField(${r.id},'ft',this.value,this)" style="width:90px;color:#e8431c;font-weight:700"></span>
+          <span><input class="ar-inp" type="number" value="${r.ctc||''}" min="0" placeholder="Add CTC"
+            onchange="updateField(${r.id},'ctc',this.value,this)" style="width:120px"></span>
+          <span id="ar-wc-${r.id}" style="font-size:12px;color:var(--text2)">${wc}</span>
+          <span id="ar-mg-${r.id}"><span class="margin-pill ${mc}">${m!==null?m.toFixed(1)+'%':'—'}</span></span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>
+  <div style="font-size:11px;color:var(--text3);margin-top:10px"><i class="ti ti-device-floppy" style="vertical-align:-2px"></i> Changes save automatically and are recorded in the Change Log.</div>`;
+}
+function updateField(id,field,val,inputEl){
+  const r=rateData.find(x=>x.id===id);if(!r) return;
+  const n=parseFloat(val);
+  if(field==='ft'&&(!n||n<100)){showToast('FT rate must be at least $100','#dc2626');return;}
+  const oldVal=r[field];
+  r[field]=n>0?n:null;
+  const m=calcMargin(r);
+  const mc=m===null?'margin-na':m>55?'margin-good':m>40?'margin-warn':'margin-bad';
+  const wc=r.ctc?'$'+Math.round(r.ctc/WEEKS_YEAR/USD_INR):'—';
+  const wcEl=document.getElementById('ar-wc-'+id);
+  const mgEl=document.getElementById('ar-mg-'+id);
+  if(wcEl) wcEl.textContent=wc;
+  if(mgEl) mgEl.innerHTML=`<span class="margin-pill ${mc}">${m!==null?m.toFixed(1)+'%':'—'}</span>`;
+  refreshAdminMetrics();
+  if(inputEl){inputEl.classList.remove('saved');inputEl.classList.add('saving');}
+  clearTimeout(saveTimers[id+'_'+field]);
+  saveTimers[id+'_'+field]=setTimeout(async()=>{
+    showSavingDot(true);
+    try{
+      await sbPatch('rates','id=eq.'+id,{[field]:r[field]});
+      await logAudit('UPDATE','rates',id,field,oldVal,r[field]);
+      if(inputEl){inputEl.classList.remove('saving');inputEl.classList.add('saved');}
+    }catch(e){showToast('Save failed','#dc2626');}
+    finally{showSavingDot(false);}
+  },800);
+}
+function refreshAdminMetrics(){
+  const avgFT=Math.round(rateData.reduce((s,r)=>s+r.ft,0)/rateData.length);
+  const withM=rateData.filter(r=>calcMargin(r)!==null);
+  const avgM=withM.length?(withM.reduce((s,r)=>s+calcMargin(r),0)/withM.length).toFixed(1):'–';
+  const flags=getFlags();
+  const mEl=document.getElementById('admin-avg-margin');
+  const fEl=document.getElementById('admin-flags');
+  const ftEl=document.getElementById('admin-avg-ft');
+  if(mEl){mEl.textContent=avgM+'%';mEl.style.color=parseFloat(avgM)>50?'#16a34a':parseFloat(avgM)>35?'#d97706':'#dc2626';}
+  if(fEl){fEl.textContent=flags.length;fEl.style.color=flags.length?'#d97706':'#16a34a';}
+  if(ftEl) ftEl.textContent=fmt(avgFT)+'/wk';
+}
+
+// ── ANALYTICS ─────────────────────────────────────────────────
+function renderAnalytics(c){
+  const byCat={};
+  rateData.forEach(r=>{
+    if(!byCat[r.category]) byCat[r.category]={count:0,totalFT:0,margins:[]};
+    byCat[r.category].count++;byCat[r.category].totalFT+=r.ft;
+    const m=calcMargin(r);if(m!==null)byCat[r.category].margins.push(m);
+  });
+  const catStats=Object.entries(byCat).map(([cat,v])=>({
+    cat,avgFT:Math.round(v.totalFT/v.count),
+    avgMargin:v.margins.length?Math.round(v.margins.reduce((a,b)=>a+b,0)/v.margins.length):null
+  })).sort((a,b)=>b.avgFT-a.avgFT);
+  const maxFT=Math.max(...catStats.map(s=>s.avgFT));
+  const withM=rateData.filter(r=>calcMargin(r)!==null);
+  const avgM=withM.length?Math.round(withM.reduce((s,r)=>s+calcMargin(r),0)/withM.length):0;
+  c.innerHTML=`
+  <div class="section-hd">Analytics</div>
+  <div class="section-sd">Rate distribution, margin insights and commercial overview.</div>
+  <div class="grid4" style="margin-bottom:18px">
+    <div class="metric"><div class="metric-label">Avg Margin</div><div class="metric-val accent">${avgM}%</div></div>
+    <div class="metric"><div class="metric-label">High Margin</div><div class="metric-val" style="color:#16a34a">${withM.filter(r=>calcMargin(r)>55).length}</div><div class="metric-sub">&gt;55%</div></div>
+    <div class="metric"><div class="metric-label">Low Margin</div><div class="metric-val" style="color:#d97706">${withM.filter(r=>calcMargin(r)<40).length}</div><div class="metric-sub">&lt;40%</div></div>
+    <div class="metric"><div class="metric-label">FT Range</div><div class="metric-val accent" style="font-size:16px">$799–$2,499</div><div class="metric-sub">/week</div></div>
+  </div>
+  <div class="grid3" style="gap:14px">
+    <div class="card" style="grid-column:span 2">
+      <div class="card-title"><i class="ti ti-chart-bar"></i> Avg FT Rate by Skill</div>
+      ${catStats.map(s=>`<div class="bar-item">
+        <div class="bar-label" title="${s.cat}">${s.cat}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${Math.round(s.avgFT/maxFT*100)}%"></div></div>
+        <div class="bar-val">${fmt(s.avgFT)}/wk</div>
+      </div>`).join('')}
+    </div>
+    <div class="card">
+      <div class="card-title"><i class="ti ti-percentage"></i> Margin by Skill</div>
+      ${catStats.map(s=>{
+        const m=s.avgMargin,col=m===null?'var(--text3)':m>55?'#16a34a':m>40?'#d97706':'#dc2626';
+        return `<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--border)">
+          <span style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:160px">${s.cat}</span>
+          <span style="font-size:12px;font-weight:700;color:${col};flex-shrink:0;margin-left:8px">${m!==null?m+'%':'No CTC'}</span>
+        </div>`;
+      }).join('')}
+    </div>
+  </div>`;
+}
+
+// ── RATE REQUESTS ADMIN ───────────────────────────────────────
+async function loadOpenBadge(){
+  try{
+    const r=await sbGet('rate_requests','status=eq.Open&select=id');
+    const b=document.getElementById('open-badge');
+    if(b){b.textContent=r.length;b.style.display=r.length?'inline':'none';}
+  }catch(e){}
+}
+let adminReqData=[];
+async function renderRequestsAdmin(c){
+  c.innerHTML=`<div class="loading-screen"><div class="spinner"></div><span>Loading requests...</span></div>`;
+  try{
+    const reqs=await sbGet('rate_requests','order=created_at.desc&limit=200');
+    const skills=await sbGet('request_skills','order=id.asc&limit=1000');
+    adminReqData=reqs.map(r=>({...r,skills:skills.filter(s=>s.request_id===r.id)}));
+    const open=adminReqData.filter(r=>r.status==='Open').length;
+    const inrev=adminReqData.filter(r=>r.status==='In Review').length;
+    const closed=adminReqData.filter(r=>r.status==='Closed').length;
+    c.innerHTML=`
+    <div class="section-hd">Rate Requests</div>
+    <div class="section-sd">Review, quote and close incoming requests from the sales team.</div>
+    <div class="grid4" style="margin-bottom:18px">
+      <div class="metric" style="border-left:3px solid #e8431c"><div class="metric-label">Open</div><div class="metric-val" style="color:#e8431c">${open}</div></div>
+      <div class="metric" style="border-left:3px solid #d97706"><div class="metric-label">In Review</div><div class="metric-val" style="color:#d97706">${inrev}</div></div>
+      <div class="metric" style="border-left:3px solid #16a34a"><div class="metric-label">Closed</div><div class="metric-val" style="color:#16a34a">${closed}</div></div>
+      <div class="metric"><div class="metric-label">Total Skills Open</div><div class="metric-val accent">${skills.filter(s=>s.status==='Open').length}</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:16px">
+      ${['All','Open','In Review','Closed'].map(f=>`<button class="btn btn-sm ${activeReqFilter===f?'btn-primary':'btn-ghost'}" onclick="setReqFilter('${f}')">${f}</button>`).join('')}
+    </div>
+    <div id="req-list">${renderAdminReqList()}</div>`;
+    const b=document.getElementById('open-badge');
+    if(b){b.textContent=open;b.style.display=open?'inline':'none';}
+  }catch(e){c.innerHTML=`<div class="loading-screen" style="color:#dc2626"><i class="ti ti-alert-triangle" style="font-size:32px"></i><span>${e.message}</span></div>`;}
+}
+function setReqFilter(f){
+  activeReqFilter=f;
+  document.querySelectorAll('[onclick^="setReqFilter"]').forEach(btn=>{
+    btn.className='btn btn-sm '+(btn.textContent===f?'btn-primary':'btn-ghost');
+  });
+  document.getElementById('req-list').innerHTML=renderAdminReqList();
+}
+function renderAdminReqList(){
+  const list=activeReqFilter==='All'?adminReqData:adminReqData.filter(r=>r.status===activeReqFilter);
+  if(!list.length) return `<div style="text-align:center;padding:40px;color:var(--text3)">No requests</div>`;
+  return list.map(r=>{
+    const sc=r.status==='Open'?'#e8431c':r.status==='In Review'?'#d97706':'#16a34a';
+    return `<div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 18px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+        <div>
+          <span style="font-weight:700;color:var(--navy);font-size:15px">${r.ref_no}</span>
+          <span style="font-size:12px;color:var(--text3);margin-left:10px">${new Date(r.created_at).toLocaleDateString('en-IN')}</span>
+        </div>
+        <select onchange="updateReqStatus(${r.id},this.value)"
+          style="padding:5px 10px;font-size:12px;border-radius:8px;font-weight:600;color:${sc};background:${sc}18;border:1.5px solid ${sc};font-family:var(--font);width:auto">
+          <option value="Open" ${r.status==='Open'?'selected':''}>Open</option>
+          <option value="In Review" ${r.status==='In Review'?'selected':''}>In Review</option>
+          <option value="Closed" ${r.status==='Closed'?'selected':''}>Closed</option>
+        </select>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;background:var(--surface2);border-radius:8px;padding:10px 14px;margin-bottom:12px">
+        <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Manager</div><div style="font-size:13px;font-weight:600;color:var(--navy)">${r.manager_name}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Email</div><div style="font-size:12px;color:var(--text2)">${r.manager_email}</div></div>
+        <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Geography</div><div style="font-size:13px;color:var(--text2)">${r.geography}</div></div>
+        ${r.notes?`<div style="grid-column:span 3"><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Notes</div><div style="font-size:12px;color:var(--text2)">${r.notes}</div></div>`:''}
+      </div>
+      <div style="font-size:12px;font-weight:600;color:var(--navy);margin-bottom:8px">${r.skills.length} Skill${r.skills.length!==1?'s':''}</div>
+      ${r.skills.map(s=>{
+        const eng=s.engagement==='ft'?'Full Time':s.engagement==='pt'?'Part Time':'Hourly';
+        const sc2=s.status==='Open'?'#e8431c':s.status==='In Review'?'#d97706':'#16a34a';
+        return `<div style="border:1px solid var(--border);border-radius:8px;padding:12px 14px;margin-bottom:8px">
+          <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr 1fr 1fr;gap:10px;align-items:center">
+            <div>
+              <div style="font-size:13px;font-weight:700;color:var(--navy)">${s.skill}</div>
+              <span style="font-size:10px;padding:2px 6px;border-radius:6px;background:${s.role_type==='Managerial'?'#eff6ff':'#f0fdf4'};color:${s.role_type==='Managerial'?'#1d4ed8':'#166534'}">${s.role_type}</span>
+            </div>
+            <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Experience</div><div style="font-size:12px">${s.exp_range}</div></div>
+            <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Engagement</div><div style="font-size:12px">${eng}</div></div>
+            <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">JD Document</div>
+              ${s.jd_file_path?`<button class="btn btn-success btn-sm" onclick="downloadJD('${s.jd_file_path}','${s.jd_file_name}')"><i class="ti ti-download"></i> Download</button>`:'<span style="font-size:11px;color:var(--text3)">No file</span>'}
+            </div>
+            <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Quoted Rate</div>
+              <input type="text" placeholder="e.g. $1,200/wk" value="${s.quoted_rate||''}"
+                onchange="updateSkillRate(${s.id},this.value)"
+                style="padding:5px 8px;font-size:12px;border:1px solid var(--border);border-radius:6px;background:var(--surface2);font-family:var(--font);color:var(--navy);font-weight:600;width:100%">
+            </div>
+            <div><div style="font-size:10px;color:var(--text3);font-weight:600;text-transform:uppercase;margin-bottom:2px">Status</div>
+              <select onchange="updateSkillStatus(${s.id},${r.id},this.value)"
+                style="padding:5px 8px;font-size:12px;border-radius:6px;font-weight:600;color:${sc2};background:${sc2}18;border:1.5px solid ${sc2};font-family:var(--font);width:100%">
+                <option value="Open" ${s.status==='Open'?'selected':''}>Open</option>
+                <option value="In Review" ${s.status==='In Review'?'selected':''}>In Review</option>
+                <option value="Closed" ${s.status==='Closed'?'selected':''}>Closed</option>
+              </select>
+            </div>
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  }).join('');
+}
+async function downloadJD(path,name){
+  try{
+    const r=await fetch(`${SB_URL}/storage/v1/object/sign/jd-documents/${path}`,{
+      method:'POST',headers:{...HEADERS},body:JSON.stringify({expiresIn:120})});
+    if(!r.ok) throw new Error(await r.text());
+    const d=await r.json();
+    const url=SB_URL+'/storage/v1'+d.signedURL;
+    const a=document.createElement('a');a.href=url;a.download=name;a.target='_blank';a.click();
+  }catch(e){showToast('Download failed: '+e.message,'#dc2626');}
+}
+async function updateReqStatus(id,status){
+  try{
+    await sbPatch('rate_requests','id=eq.'+id,{status,updated_at:new Date().toISOString()});
+    const r=adminReqData.find(x=>x.id===id);if(r) r.status=status;
+    showToast('Status updated');
+    loadOpenBadge();
+    renderRequestsAdmin(document.getElementById('content'));
+  }catch(e){showToast('Update failed','#dc2626');}
+}
+async function updateSkillStatus(skillId,reqId,status){
+  try{
+    await sbPatch('request_skills','id=eq.'+skillId,{status});
+    const r=adminReqData.find(x=>x.id===reqId);
+    if(r){const s=r.skills.find(x=>x.id===skillId);if(s)s.status=status;}
+    // Auto-close request if all skills closed
+    if(r&&r.skills.every(s=>s.status==='Closed')){
+      await sbPatch('rate_requests','id=eq.'+reqId,{status:'Closed',updated_at:new Date().toISOString()});
+      r.status='Closed';showToast('All skills closed — request auto-closed');
+    } else showToast('Skill status updated');
+    loadOpenBadge();
+    renderRequestsAdmin(document.getElementById('content'));
+  }catch(e){showToast('Update failed','#dc2626');}
+}
+async function updateSkillRate(skillId,rate){
+  try{await sbPatch('request_skills','id=eq.'+skillId,{quoted_rate:rate});showToast('Rate saved');}
+  catch(e){showToast('Save failed','#dc2626');}
+}
+
+// ── USER MANAGEMENT ───────────────────────────────────────────
+async function renderUsers(c){
+  c.innerHTML=`<div class="loading-screen"><div class="spinner"></div><span>Loading users...</span></div>`;
+  try{
+    const users=await sbGet('rd_users','order=created_at.asc');
+    c.innerHTML=`
+    <div class="section-hd">User Management</div>
+    <div class="section-sd">Create and manage user accounts. Admin can reset passwords and deactivate users.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+        <tbody>
+          ${users.map(u=>`<tr>
+            <td style="color:var(--navy);font-weight:600">${u.name}</td>
+            <td>${u.email}</td>
+            <td><span class="badge ${u.role==='admin'?'badge-admin':'badge-sales'}">${u.role==='admin'?'Admin':'Sales'}</span></td>
+            <td><span class="badge ${u.is_active?'badge-sales':'badge-inactive'}">${u.is_active?'Active':'Inactive'}</span></td>
+            <td style="color:var(--text3)">${new Date(u.created_at).toLocaleDateString('en-IN')}</td>
+            <td>
+              <div style="display:flex;gap:6px">
+                <button class="btn btn-ghost btn-sm" onclick="showResetPasswordModal(${u.id},'${u.name}')"><i class="ti ti-key"></i> Reset PW</button>
+                ${u.email!==currentUser.email?`<button class="btn btn-ghost btn-sm" onclick="toggleUserActive(${u.id},${u.is_active},'${u.name}')">
+                  <i class="ti ti-${u.is_active?'user-off':'user-check'}"></i> ${u.is_active?'Deactivate':'Activate'}
+                </button>`:''}
+              </div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }catch(e){c.innerHTML=`<div class="loading-screen" style="color:#dc2626"><span>${e.message}</span></div>`;}
+}
+function showAddUserModal(){
+  document.getElementById('modal-container').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-title">Add New User</div>
+      <div style="display:grid;gap:12px">
+        <div><label>Full Name *</label><input type="text" id="nu-name" placeholder="e.g. Rahul Sharma"></div>
+        <div><label>Email Address *</label><input type="email" id="nu-email" placeholder="rahul@clariontech.com"></div>
+        <div><label>Password *</label><input type="password" id="nu-pw" placeholder="Set a password"></div>
+        <div><label>Role *</label>
+          <select id="nu-role">
+            <option value="sales">Sales / Delivery</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+      </div>
+      <div id="nu-err" style="display:none;color:#dc2626;font-size:12px;margin-top:10px"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="createUser()"><i class="ti ti-user-plus"></i> Create User</button>
+      </div>
+    </div>
+  </div>`;
+}
+async function createUser(){
+  const name=document.getElementById('nu-name').value.trim();
+  const email=document.getElementById('nu-email').value.trim().toLowerCase();
+  const pw=document.getElementById('nu-pw').value;
+  const role=document.getElementById('nu-role').value;
+  const errEl=document.getElementById('nu-err');
+  if(!name||!email||!pw){errEl.textContent='All fields are required.';errEl.style.display='block';return;}
+  if(!email.includes('@')){errEl.textContent='Enter a valid email address.';errEl.style.display='block';return;}
+  if(pw.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}
+  try{
+    const hash=await hashPassword(pw);
+    await sbPost('rd_users',{name,email,password_hash:hash,role,is_active:true});
+    await logAudit('CREATE_USER','rd_users',null,'email',null,email);
+    closeModal();
+    showToast('User created successfully');
+    showPage('users');
+  }catch(e){
+    errEl.textContent=e.message.includes('duplicate')||e.message.includes('unique')?'This email is already registered.':'Failed: '+e.message;
+    errEl.style.display='block';
+  }
+}
+function showResetPasswordModal(userId,userName){
+  document.getElementById('modal-container').innerHTML=`
+  <div class="modal-overlay" onclick="if(event.target===this)closeModal()">
+    <div class="modal">
+      <div class="modal-title">Reset Password — ${userName}</div>
+      <div><label>New Password *</label><input type="password" id="rp-pw" placeholder="Enter new password"></div>
+      <div><label style="margin-top:12px">Confirm Password *</label><input type="password" id="rp-pw2" placeholder="Confirm new password" style="margin-top:0"></div>
+      <div id="rp-err" style="display:none;color:#dc2626;font-size:12px;margin-top:10px"></div>
+      <div class="modal-footer">
+        <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="resetPassword(${userId},'${userName}')"><i class="ti ti-key"></i> Reset Password</button>
+      </div>
+    </div>
+  </div>`;
+}
+async function resetPassword(userId,userName){
+  const pw=document.getElementById('rp-pw').value;
+  const pw2=document.getElementById('rp-pw2').value;
+  const errEl=document.getElementById('rp-err');
+  if(!pw||!pw2){errEl.textContent='Both fields are required.';errEl.style.display='block';return;}
+  if(pw!==pw2){errEl.textContent='Passwords do not match.';errEl.style.display='block';return;}
+  if(pw.length<6){errEl.textContent='Password must be at least 6 characters.';errEl.style.display='block';return;}
+  try{
+    const hash=await hashPassword(pw);
+    await sbPatch('rd_users','id=eq.'+userId,{password_hash:hash,updated_at:new Date().toISOString()});
+    await logAudit('RESET_PASSWORD','rd_users',userId,'password',null,'[changed]');
+    closeModal();showToast('Password reset for '+userName);
+  }catch(e){errEl.textContent='Failed: '+e.message;errEl.style.display='block';}
+}
+async function toggleUserActive(userId,isActive,name){
+  try{
+    await sbPatch('rd_users','id=eq.'+userId,{is_active:!isActive,updated_at:new Date().toISOString()});
+    await logAudit(isActive?'DEACTIVATE_USER':'ACTIVATE_USER','rd_users',userId,'is_active',isActive,!isActive);
+    showToast((isActive?'Deactivated':'Activated')+' '+name);
+    showPage('users');
+  }catch(e){showToast('Failed: '+e.message,'#dc2626');}
+}
+function closeModal(){document.getElementById('modal-container').innerHTML='';}
+
+// ── AUDIT LOG ─────────────────────────────────────────────────
+async function renderAuditLog(c){
+  c.innerHTML=`<div class="loading-screen"><div class="spinner"></div><span>Loading change log...</span></div>`;
+  try{
+    const logs=await sbGet('rd_audit_log','order=created_at.desc&limit=200');
+    c.innerHTML=`
+    <div class="section-hd">Change Log</div>
+    <div class="section-sd">Full audit trail of all rate changes, user actions and system events.</div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Date & Time</th><th>User</th><th>Action</th><th>Table</th><th>Field</th><th>Old Value</th><th>New Value</th></tr></thead>
+        <tbody>
+          ${!logs.length?`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3)">No changes recorded yet</td></tr>`:''}
+          ${logs.map(l=>{
+            const actionColor=l.action.includes('DELETE')||l.action.includes('DEACTIVATE')?'#dc2626':
+              l.action.includes('CREATE')||l.action.includes('ACTIVATE')?'#16a34a':'#d97706';
+            return `<tr>
+              <td style="color:var(--text3);white-space:nowrap">${new Date(l.created_at).toLocaleString('en-IN')}</td>
+              <td><div style="font-weight:600;color:var(--navy);font-size:12px">${l.user_name}</div><div style="font-size:11px;color:var(--text3)">${l.user_email}</div></td>
+              <td><span style="font-size:11px;font-weight:700;color:${actionColor};background:${actionColor}18;padding:3px 8px;border-radius:6px">${l.action}</span></td>
+              <td style="font-size:12px">${l.table_name}</td>
+              <td style="font-size:12px;color:var(--text2)">${l.field_name||'—'}</td>
+              <td style="font-size:12px;color:#dc2626">${l.old_value||'—'}</td>
+              <td style="font-size:12px;color:#16a34a">${l.new_value||'—'}</td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    </div>`;
+  }catch(e){c.innerHTML=`<div class="loading-screen" style="color:#dc2626"><span>${e.message}</span></div>`;}
+}
+</script>
+</body>
+</html>
